@@ -1,0 +1,258 @@
+[
+    {
+        "question_id": 342,
+        "db_id": "card_games",
+        "question": "List the card names with value that cost more converted mana for the face.",
+        "evidence": "more converted mana for the face refers to Max(faceConvertedManaCost);",
+        "SQL": "SELECT name FROM cards WHERE faceConvertedManaCost IS NOT NULL AND faceConvertedManaCost = (SELECT MAX(faceConvertedManaCost)  FROM cards  WHERE faceConvertedManaCost IS NOT NULL)",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 610,
+        "db_id": "codebase_community",
+        "question": "What are the names of badges that users who have the highest reputation obtained?",
+        "evidence": "highest reputation refers to Max(Reputation); user refers to UserId",
+        "SQL": "SELECT T2.name FROM users AS T1 INNER JOIN badges AS T2 ON T1.Id = T2.UserId WHERE T1.Reputation = (SELECT MAX(Reputation) FROM users)",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 694,
+        "db_id": "codebase_community",
+        "question": "Provide the text of the latest comment to the post with the title 'Analysing wind data with R' and the display name of the user who left it.",
+        "evidence": "the latest comment refers to MAX(CreationDate);",
+        "SQL": "SELECT T3.Text, T1.DisplayName FROM users AS T1 INNER JOIN posts AS T2 ON T1.Id = T2.OwnerUserId INNER JOIN comments AS T3 ON T2.Id = T3.PostId WHERE T2.Title = 'Analysing wind data with R' AND T3.CreationDate = (SELECT MAX(T4.CreationDate) FROM users AS T5 INNER JOIN posts AS T6 ON T5.Id = T6.OwnerUserId INNER JOIN comments AS T4 ON T6.Id = T4.PostId WHERE T6.Title = 'Analysing wind data with R')",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 802,
+        "db_id": "superhero",
+        "question": "Who is the tallest superhero?",
+        "evidence": "who refers to superhero_name; tallest superhero refers to MAX(height_cm);",
+        "SQL": "SELECT superhero_name FROM superhero WHERE height_cm = (SELECT MAX(height_cm) FROM superhero)",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 810,
+        "db_id": "superhero",
+        "question": "What is the race of the superhero with maximum attribute value?",
+        "evidence": "maximum attribute value refers to MAX(attribute_value);",
+        "SQL": "SELECT T3.race FROM superhero AS T1 INNER JOIN hero_attribute AS T2 ON T1.id = T2.hero_id INNER JOIN race AS T3 ON T1.race_id = T3.id WHERE T2.attribute_value = (SELECT MAX(T4.attribute_value) FROM hero_attribute AS T4)",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 828,
+        "db_id": "superhero",
+        "question": "Count the fastest superheroes.",
+        "evidence": "fastest refers to attribute_value = 100 WHERE attribute_name = 'Speed';",
+        "SQL": "SELECT COUNT(T3.superhero_name) FROM hero_attribute AS T1 INNER JOIN attribute AS T2 ON T1.attribute_id = T2.id INNER JOIN superhero AS T3 ON T1.hero_id = T3.id WHERE T2.attribute_name = 'Speed' AND T1.attribute_value = (SELECT MAX(T4.attribute_value) FROM hero_attribute AS T4 INNER JOIN attribute AS T5 ON T4.attribute_id = T5.id WHERE T5.attribute_name = 'Speed')",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 847,
+        "db_id": "formula_1",
+        "question": "What is the surname of the driver with the best lap time in race number 19 in the second period?",
+        "evidence": "race number refers to raceId; second qualifying period refers to q2; best lap time refers to MIN(q2);",
+        "SQL": "SELECT T2.surname FROM qualifying AS T1 INNER JOIN drivers AS T2 ON T2.driverId = T1.driverId WHERE T1.raceId = 19 AND T1.q2 IS NOT NULL AND T1.q2 = (SELECT MIN(q2) AS min_q2 FROM qualifying WHERE raceId = 19 AND q2 IS NOT NULL)",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 32,
+        "db_id": "california_schools",
+        "question": "What is the eligible free or reduced price meal rate for the top 5 schools in grades 1-12 with the highest free or reduced price meal count of the schools with the ownership code 66?",
+        "evidence": "grades 1-12 means K-12; Eligible free or reduced price meal rate for K-12 = `FRPM Count (K-12)` / `Enrollment (K-12)`",
+        "SQL": "SELECT CAST(T1.`FRPM Count (K-12)` AS REAL) / T1.`Enrollment (K-12)` FROM frpm AS T1 INNER JOIN schools AS T2 ON T1.CDSCode = T2.CDSCode WHERE T2.SOC = 66 ORDER BY T1.`FRPM Count (K-12)` DESC LIMIT 5",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 36,
+        "db_id": "california_schools",
+        "question": "Under whose administration is the school with the highest number of students scoring 1500 or more on the SAT? Indicate their full names.",
+        "evidence": "full name means first name, last name; There are at most 3 administrators for each school; SAT Scores are greater or equal to 1500 refers to NumGE1500",
+        "SQL": "SELECT T2.AdmFName1, T2.AdmLName1, T2.AdmFName2, T2.AdmLName2, T2.AdmFName3, T2.AdmLName3 FROM satscores AS T1 INNER JOIN schools AS T2 ON T1.cds = T2.CDSCode ORDER BY T1.NumGE1500 DESC LIMIT 1",
+        "difficulty": "challenging"
+    },
+    {
+        "question_id": 54,
+        "db_id": "california_schools",
+        "question": "Please specify all of the schools and their related mailing zip codes that are under Avetik Atoian's administration.",
+        "evidence": "",
+        "SQL": "SELECT School, MailZip FROM schools WHERE AdmFName1 = 'Avetik' AND AdmLName1 = 'Atoian'",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 60,
+        "db_id": "california_schools",
+        "question": "What are the websites for all the partially virtual chartered schools located in San Joaquin?",
+        "evidence": "Virtual = 'P' means partially virtual; Charter schools refers to Charter = 1 in the table schools",
+        "SQL": "SELECT Website FROM schools WHERE County = 'San Joaquin' AND Virtual = 'P' AND Charter = 1",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 101,
+        "db_id": "financial",
+        "question": "List out the accounts who have the earliest trading date in 1995 ?",
+        "evidence": "",
+        "SQL": "SELECT account_id FROM trans WHERE STRFTIME('%Y', date) = '1995' ORDER BY date ASC LIMIT 1",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 117,
+        "db_id": "financial",
+        "question": "What is the percentage of loan amount that has been fully paid with no issue.",
+        "evidence": "Loan paid with no issue means contract finished, no problems; status = 'A' means contract finished, no problems; Percentage of accounts by condition = [(total(amount) & condition) / (total amount)] * 100%",
+        "SQL": "SELECT (CAST(SUM(CASE WHEN status = 'A' THEN amount ELSE 0 END) AS REAL) * 100) / SUM(amount) FROM loan",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 220,
+        "db_id": "toxicology",
+        "question": "Please list top three elements of the toxicology of the molecule TR000 in alphabetical order.",
+        "evidence": "TR000 is the molecule id;",
+        "SQL": "SELECT DISTINCT T.element FROM atom AS T WHERE T.molecule_id = 'TR000' ORDER BY T.element LIMIT 3",
+        "difficulty": "challenging"
+    },
+    {
+        "question_id": 241,
+        "db_id": "toxicology",
+        "question": "How many of the molecules are not carcinogenic?",
+        "evidence": "label = '-' means molecules are non-carcinogenic",
+        "SQL": "SELECT COUNT(T.molecule_id) FROM molecule AS T WHERE T.label = '-'",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 330,
+        "db_id": "toxicology",
+        "question": "Calculate the percentage of carcinogenic molecules with triple bonded Hidrogen atoms.",
+        "evidence": "hydrogen refers to element = 'h'; label = '+' mean molecules are carcinogenic; triple bond refers to bond_type = '#'; percentage = DIVIDE(SUM(label = '+'), COUNT(molecule_id)) * 100.0 where element = 'h' AND bond_type = '#';",
+        "SQL": "SELECT CAST(SUM(CASE WHEN T1.label = '+' THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(DISTINCT T1.molecule_id) FROM molecule AS T1 INNER JOIN atom AS T2 ON T1.molecule_id = T2.molecule_id INNER JOIN bond AS T3 ON T1.molecule_id = T3.molecule_id WHERE T3.bond_type = '#' AND T2.element = 'h'",
+        "difficulty": "challenging"
+    },
+    {
+        "question_id": 345,
+        "db_id": "card_games",
+        "question": "For artifact type of cards that do not have multiple faces on the same card, state its legalities status for vintage play format.",
+        "evidence": "Artifact type of cards refers to types = 'Artifact'; card does not have multiple faces on the same card refers to side is NULL'; vintage play format refers to format = 'vintage';",
+        "SQL": "SELECT DISTINCT T2.status FROM cards AS T1 INNER JOIN legalities AS T2 ON T1.uuid = T2.uuid WHERE T1.type = 'Artifact' AND T2.format = 'vintage' AND T1.side IS NULL",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 352,
+        "db_id": "card_games",
+        "question": "Calculate the percentage of the cards availabe in Chinese Simplified.",
+        "evidence": "Chinese Simplified' is the language; percentage = Divide(Sum(id where language = 'Chinese Simplified'), Count(id)) *100",
+        "SQL": "SELECT CAST(SUM(CASE WHEN T2.language = 'Chinese Simplified' THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(T1.id) FROM cards AS T1 INNER JOIN foreign_data AS T2 ON T1.uuid = T2.uuid",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 402,
+        "db_id": "card_games",
+        "question": "What is the percentage of Story Spotlight cards that do not have a text box? List them by their ID.",
+        "evidence": "Story Spotlight cards that do not have a text box refers to isStorylight = 1 and isTextless = 0; Percentage = DIVIDE(SUM(count(id) where isStorylight = 1 AND isTextless = 0 ), SUM(count(id))) * 100",
+        "SQL": "SELECT CAST(SUM(CASE WHEN isTextless = 0 THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(id) FROM cards WHERE isStorySpotlight = 1",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 418,
+        "db_id": "card_games",
+        "question": "What kind of printing is on the card that Daren Bader created?",
+        "evidence": "kind of printing refers to availability; Daren Bader created refers to artist = 'Daren Bader'",
+        "SQL": "SELECT DISTINCT availability FROM cards WHERE artist = 'Daren Bader'",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 453,
+        "db_id": "card_games",
+        "question": "What's the unconverted mana cost of the card \"Ancestor's Chosen\"?",
+        "evidence": "card \"Ancestor's Chosen\" refers to name = 'Ancestor`s Chosen'",
+        "SQL": "SELECT DISTINCT manaCost FROM cards WHERE name = 'Ancestor''s Chosen'",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 484,
+        "db_id": "card_games",
+        "question": "Please list the Italian names of the cards in the set Coldsnap with the highest converted mana cost.",
+        "evidence": "card set Coldsnap refers to name = 'Coldsnap'; Italian refers to language = 'Italian'; highest converted mana cost refers to MAX(convertedManaCost)",
+        "SQL": "SELECT T2.name FROM foreign_data AS T1 INNER JOIN cards AS T2 ON T2.uuid = T1.uuid INNER JOIN sets AS T3 ON T3.code = T2.setCode WHERE T3.name = 'Coldsnap' AND T1.language = 'Italian' ORDER BY T2.convertedManaCost DESC",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 947,
+        "db_id": "formula_1",
+        "question": "How many British drivers were born after 1980?",
+        "evidence": "born after 1980 refers to year (dob) >1980;",
+        "SQL": "SELECT COUNT(driverId) FROM drivers WHERE nationality = 'British' AND STRFTIME('%Y', dob) > '1980'",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 1150,
+        "db_id": "thrombosis_prediction",
+        "question": "What is the percentage of female patient were born after 1930?",
+        "evidence": "female refers to Sex = 'F'; patient who were born after 1930 refers to year(Birthday) > '1930'; calculation = DIVIDE(COUNT(ID) where year(Birthday) > '1930' and SEX = 'F'), (COUNT(ID) where SEX = 'F')",
+        "SQL": "SELECT CAST(SUM(CASE WHEN STRFTIME('%Y', Birthday) > '1930' THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(*) FROM Patient WHERE SEX = 'F'",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 1151,
+        "db_id": "thrombosis_prediction",
+        "question": "For patient born between Year 1930 to 1940, how many percent of them were inpatient?",
+        "evidence": "patient born between Year 1930 to 1940 refers to year(Birthday) BETWEEN '1930-01-01' AND '1940-12-31'; inpatient refers to Admission = '+'",
+        "SQL": "SELECT CAST(SUM(CASE WHEN Admission = '+' THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(*) FROM Patient WHERE STRFTIME('%Y', Birthday) BETWEEN '1930' AND '1940'",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 1152,
+        "db_id": "thrombosis_prediction",
+        "question": "What is the ratio of outpatient to inpatient followed up treatment among all the 'SLE' diagnosed patient?",
+        "evidence": "'SLE' diagnosed patient means Diagnosis = 'SLE'; inpatient refers to Admission = '+'; outpatient refers to Admission = '-'; calculation =  DIVIDE(COUNT(ID) where Diagnosis = 'SLE' and Admission = '+', COUNT(ID) where Diagnosis = 'SLE' and Admission = '-')",
+        "SQL": "SELECT SUM(CASE WHEN Admission = '+' THEN 1.0 ELSE 0 END) / SUM(CASE WHEN Admission = '-' THEN 1 ELSE 0 END) FROM Patient WHERE Diagnosis = 'SLE'",
+        "difficulty": "moderate"
+    },
+    {
+        "question_id": 1153,
+        "db_id": "thrombosis_prediction",
+        "question": "What is the disease patient '30609' diagnosed with. List all the date of laboratory tests done for this patient.",
+        "evidence": "'30609' is the Patient ID; disease means Diagnosis",
+        "SQL": "SELECT T1.Diagnosis, T2.Date FROM Patient AS T1 INNER JOIN Laboratory AS T2 ON T1.ID = T2.ID WHERE T1.ID = 30609",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 1517,
+        "db_id": "debit_card_specializing",
+        "question": "For the earliest customer, what segment did he/she have?",
+        "evidence": "",
+        "SQL": "SELECT T2.Segment FROM transactions_1k AS T1 INNER JOIN customers AS T2 ON T1.CustomerID = T2.CustomerID WHERE T1.Date = (SELECT MIN(Date) FROM transactions_1k)",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 1020,
+        "db_id": "european_football_2",
+        "question": "Which player has the highest overall rating? Indicate the player's api id.",
+        "evidence": "highest overall rating refers to MAX(overall_rating);",
+        "SQL": "SELECT player_api_id FROM Player_Attributes WHERE overall_rating = (SELECT MAX(overall_rating) FROM Player_Attributes)",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 1022,
+        "db_id": "european_football_2",
+        "question": "What is the preferred foot when attacking of the player with the lowest potential?",
+        "evidence": "preferred foot when attacking refers to preferred_foot; lowest potential refers to MIN(potential);",
+        "SQL": "SELECT preferred_foot FROM Player_Attributes WHERE penalties AND potential = (SELECT MIN(potential) FROM Player_Attributes)",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 1034,
+        "db_id": "european_football_2",
+        "question": "List the players' api id who had the highest above average overall ratings in 2010.",
+        "evidence": "highest above average overall ratings refers to MAX(overall_rating); in 2010 refers to substr(date,1,4) = '2010';",
+        "SQL": "SELECT p.player_api_id FROM Player_Attributes AS p WHERE SUBSTR(p.date, 1, 4) = '2010' AND p.overall_rating = (SELECT MAX(pa.overall_rating) FROM Player_Attributes AS pa WHERE SUBSTR(pa.date, 1, 4) = '2010')",
+        "difficulty": "simple"
+    },
+    {
+        "question_id": 1365,
+        "db_id": "student_club",
+        "question": "What are the expenses of the budget with the lowest remaining?",
+        "evidence": "expense of budget refers to expense_description; lowest remaining refers to MIN(remaining)",
+        "SQL": "SELECT T2.expense_description FROM budget AS T1 INNER JOIN expense AS T2 ON T1.budget_id = T2.link_to_budget WHERE T1.remaining = (SELECT MIN(remaining) FROM budget)",
+        "difficulty": "simple"
+    }
+]
